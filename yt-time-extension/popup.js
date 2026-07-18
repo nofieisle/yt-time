@@ -101,11 +101,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initial update
   updateUI();
 
-  // Polling update every 1 second while popup is open
-  const intervalId = setInterval(updateUI, 1000);
-
-  // Clean up interval on close
-  window.addEventListener('unload', () => {
-    clearInterval(intervalId);
+  // React immediately whenever background updates storage (no polling lag)
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'local' && ('timeSpent' in changes || 'limit' in changes)) {
+      updateUI();
+    }
   });
 });
