@@ -119,7 +119,8 @@ async function handleHeartbeat() {
   // Ensure we only increment at most once per second
   if (now - lastTickTime < 950) {
     const data = await chrome.storage.local.get(['timeSpent', 'limit']);
-    return { isBlocked: (data.timeSpent || 0) >= (data.limit || DEFAULT_LIMIT) };
+    const limit = data.limit || DEFAULT_LIMIT;
+    return { isBlocked: (data.timeSpent || 0) >= limit, limit };
   }
   
   lastTickTime = now;
@@ -132,14 +133,14 @@ async function handleHeartbeat() {
 
     if (newTimeSpent >= data.limit) {
       // Trigger block immediately on all tabs
-      await broadcastToYouTubeTabs({ action: "block" });
-      return { isBlocked: true };
+      await broadcastToYouTubeTabs({ action: "block", limit: data.limit });
+      return { isBlocked: true, limit: data.limit };
     }
-    return { isBlocked: false };
+    return { isBlocked: false, limit: data.limit };
   }
 
   updateBadge(data.timeSpent, data.limit);
-  return { isBlocked: true };
+  return { isBlocked: true, limit: data.limit };
 }
 
 async function resetTime() {
@@ -169,7 +170,7 @@ async function setLimit(newLimit) {
 
   updateBadge(timeSpent, newLimit);
   if (timeSpent >= newLimit) {
-    await broadcastToYouTubeTabs({ action: "block" });
+    await broadcastToYouTubeTabs({ action: "block", limit: newLimit });
   } else {
     await broadcastToYouTubeTabs({ action: "unblock" });
   }

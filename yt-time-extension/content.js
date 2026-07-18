@@ -1,19 +1,30 @@
 let isBlocked = false;
 let blockOverlay = null;
 
+// Format seconds to a user-friendly string
+function formatLimit(seconds) {
+  if (!seconds || seconds < 60) return `${seconds || 0}秒`;
+  const totalMinutes = Math.floor(seconds / 60);
+  const h = Math.floor(totalMinutes / 60);
+  const m = totalMinutes % 60;
+  if (h === 0) return `${m}分`;
+  if (m === 0) return `${h}時間`;
+  return `${h}時間${m}分`;
+}
+
 // Initialize state on load
 function init() {
   chrome.runtime.sendMessage({ action: "getTime" }, (response) => {
     if (chrome.runtime.lastError) return;
     if (response && response.isBlocked) {
-      blockYouTube();
+      blockYouTube(response.limit);
     }
   });
 
   // Listen for messages from background
   chrome.runtime.onMessage.addListener((request) => {
     if (request.action === "block") {
-      blockYouTube();
+      blockYouTube(request.limit);
     } else if (request.action === "unblock") {
       unblockYouTube();
     }
@@ -35,7 +46,7 @@ function checkVideoStatus() {
     chrome.runtime.sendMessage({ action: "heartbeat" }, (response) => {
       if (chrome.runtime.lastError) return;
       if (response && response.isBlocked) {
-        blockYouTube();
+        blockYouTube(response.limit);
       }
     });
   }
@@ -54,7 +65,7 @@ function enforceBlock() {
   });
 }
 
-function blockYouTube() {
+function blockYouTube(limit) {
   if (isBlocked) return;
   isBlocked = true;
 
@@ -86,7 +97,8 @@ function blockYouTube() {
     // Description
     const desc = document.createElement('p');
     desc.className = 'yt-block-desc';
-    desc.textContent = '本日のYouTube視聴時間（2時間）を超えました。デジタルデトックスをして、また明日動画を楽しみましょう！';
+    const limitText = formatLimit(limit);
+    desc.textContent = `本日のYouTube視聴時間（${limitText}）を超えました。デジタルデトックスをして、また明日動画を楽しみましょう！`;
     
     container.appendChild(icon);
     container.appendChild(title);
