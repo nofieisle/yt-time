@@ -55,8 +55,8 @@ document.addEventListener('DOMContentLoaded', () => {
       // Sync debug toggle checkbox status
       debugToggleEl.checked = (limit === 10);
 
-      // Sync custom limit input (show in minutes, skip debug mode)
-      if (limit !== 10) {
+      // Sync custom limit input only when not focused and not in debug mode
+      if (limit !== 10 && document.activeElement !== customLimitInput) {
         customLimitInput.value = Math.floor(limit / 60);
       }
     });
@@ -84,6 +84,11 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.runtime.sendMessage({ action: "setLimit", limit: newLimit }, () => {
       updateUI();
     });
+  });
+
+  // Also apply on Enter key
+  customLimitInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') saveLimitButton.click();
   });
 
   // Reset button action
