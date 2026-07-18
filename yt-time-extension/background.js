@@ -48,6 +48,39 @@ async function broadcastToYouTubeTabs(message) {
   }
 }
 
+// Update extension icon badge with remaining time and color
+function updateBadge(timeSpent, limit) {
+  const remaining = Math.max(limit - timeSpent, 0);
+  const ratio = timeSpent / limit;
+
+  // Badge text: compact remaining time
+  let text;
+  if (remaining <= 0) {
+    text = 'END';
+  } else if (remaining >= 3600) {
+    text = Math.floor(remaining / 3600) + 'h';
+  } else if (remaining >= 60) {
+    text = Math.floor(remaining / 60) + 'm';
+  } else {
+    text = remaining + 's';
+  }
+
+  // Badge color: green → orange → red
+  let color;
+  if (remaining <= 0) {
+    color = '#c0392b'; // blocked: dark red
+  } else if (ratio >= 0.75) {
+    color = '#e74c3c'; // < 25% remaining: red
+  } else if (ratio >= 0.5) {
+    color = '#e67e22'; // < 50% remaining: orange
+  } else {
+    color = '#27ae60'; // plenty remaining: green
+  }
+
+  chrome.action.setBadgeText({ text });
+  chrome.action.setBadgeBackgroundColor({ color });
+}
+
 // Handle messages from content script or popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "heartbeat") {
@@ -95,7 +128,8 @@ async function handleHeartbeat() {
   if (data.timeSpent < data.limit) {
     const newTimeSpent = data.timeSpent + 1;
     await chrome.storage.local.set({ timeSpent: newTimeSpent });
-    
+    updateBadge(newTimeSpent, data.limit);
+
     if (newTimeSpent >= data.limit) {
       // Trigger block immediately on all tabs
       await broadcastToYouTubeTabs({ action: "block" });
@@ -103,7 +137,8 @@ async function handleHeartbeat() {
     }
     return { isBlocked: false };
   }
-  
+
+  updateBadge(data.timeSpent, data.limit);
   return { isBlocked: true };
 }
 
@@ -117,7 +152,8 @@ async function resetTime() {
     timeSpent: 0,
     limit: limit
   });
-  
+
+  updateBadge(0, limit);
   await broadcastToYouTubeTabs({ action: "unblock" });
 }
 
@@ -130,13 +166,14 @@ async function setLimit(newLimit) {
     date: today,
     limit: newLimit
   });
-  
+
+  updateBadge(timeSpent, newLimit);
   if (timeSpent >= newLimit) {
     await broadcastToYouTubeTabs({ action: "block" });
   } else {
     await broadcastToYouTubeTabs({ action: "unblock" });
   }
-  
+
   return { success: true, isBlocked: timeSpent >= newLimit };
 }
 
@@ -145,9 +182,14 @@ chrome.runtime.onInstalled.addListener(async () => {
   const today = getLocalDateString();
   const data = await chrome.storage.local.get(['date', 'timeSpent', 'limit']);
   
+  const timeSpent = data.timeSpent || 0;
+  const limit = data.limit || DEFAULT_LIMIT;
+
   await chrome.storage.local.set({
     date: data.date || today,
-    timeSpent: data.timeSpent || 0,
-    limit: data.limit || DEFAULT_LIMIT
+    timeSpent,
+    limit
   });
+
+  updateBadge(timeSpent, limit);
 });
