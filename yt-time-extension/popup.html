@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YT Time Limiter</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <header>
+      <h2>⏱️ yt-time</h2>
+    </header>
+
+    <main>
+      <!-- Time display -->
+      <div class="time-display-section">
+        <div class="stat-label">本日の視聴時間</div>
+        <div id="time-spent" class="time-value">00:00:00</div>
+        
+        <!-- Progress bar -->
+        <div class="progress-container">
+          <div id="progress-bar" class="progress-bar"></div>
+        </div>
+        
+        <div class="limit-info">
+          <span>制限時間: <span id="time-limit-text">2時間</span></span>
+        </div>
+      </div>
+
+      <!-- Status tag -->
+      <div id="status-badge" class="status-badge status-ok">
+        動画視聴可能
+      </div>
+
+      <!-- Debug Tools (Collapsible or simple list) -->
+      <div class="debug-section">
+        <div class="debug-title">デバッグツール</div>
+        <div class="debug-controls">
+          <div class="toggle-control">
+            <label class="switch">
+              <input type="checkbox" id="debug-limit-toggle">
+              <span class="slider round"></span>
+            </label>
+            <span class="control-label">テスト用制限 (10秒)</span>
+          </div>
+          <button id="reset-button" class="btn btn-danger">視聴時間をリセット</button>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <span>Digital Detox Helper</span>
+    </footer>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

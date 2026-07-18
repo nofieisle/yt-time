@@ -1,0 +1,95 @@
+/* Overlay Container */
+#yt-time-blocker-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: radial-gradient(circle at center, #1a1a2e 0%, #0f0f15 100%) !important;
+  z-index: 2147483647 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+  color: #ffffff !important;
+  animation: yt-fade-in 0.5s ease-out forwards !important;
+}
+
+/* Scroll Lock on body */
+.yt-time-blocked-body {
+  overflow: hidden !important;
+  height: 100vh !important;
+}
+
+/* Card Container */
+.yt-block-container {
+  text-align: center !important;
+  padding: 40px !important;
+  max-width: 500px !important;
+  width: 90% !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 24px !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5) !important;
+  animation: yt-slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+/* Icon */
+.yt-block-icon {
+  font-size: 64px !important;
+  margin-bottom: 24px !important;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2)) !important;
+  display: inline-block !important;
+  animation: yt-pulse 2s infinite ease-in-out !important;
+}
+
+/* Title */
+.yt-block-title {
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  margin: 0 0 16px 0 !important;
+  line-height: 1.4 !important;
+  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+/* Description */
+.yt-block-desc {
+  font-size: 15px !important;
+  line-height: 1.6 !important;
+  color: #b3b3cb !important;
+  margin: 0 !important;
+}
+
+/* Animations */
+@keyframes yt-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes yt-slide-up {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes yt-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
